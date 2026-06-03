@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meta 渠道 Zikzik CPA 同期对比 Dashboard</title>
+  <style>
+    :root {
+      --ink:#1e293b; --muted:#64748b; --line:#dbe4ee; --panel:#ffffff;
+      --bg:#f5f7fb; --blue:#2563eb; --teal:#0f766e; --amber:#b45309;
+      --red:#b91c1c; --green:#15803d; --slate:#334155; --soft:#eef6ff;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); }
+    .shell { max-width:1440px; margin:0 auto; padding:28px 28px 56px; }
+    header { display:grid; grid-template-columns:1fr auto; gap:22px; align-items:end; padding:24px 0 18px; border-bottom:1px solid var(--line); }
+    h1 { margin:0; font-size:30px; letter-spacing:0; line-height:1.15; }
+    .subtitle { margin-top:10px; color:var(--muted); font-size:14px; line-height:1.7; max-width:980px; }
+    .badge-row { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    .badge { padding:7px 10px; border:1px solid var(--line); background:#fff; border-radius:6px; font-size:12px; color:var(--slate); }
+    .grid { display:grid; gap:16px; }
+    .kpis { grid-template-columns:repeat(3, minmax(0, 1fr)); margin-top:18px; }
+    .card { background:var(--panel); border:1px solid var(--line); border-radius:8px; box-shadow:0 8px 24px rgba(15,23,42,.05); }
+    .kpi { padding:18px; min-height:126px; }
+    .kpi .label { color:var(--muted); font-size:13px; }
+    .kpi .value { margin-top:10px; font-size:30px; font-weight:750; letter-spacing:0; }
+    .kpi .hint { margin-top:8px; color:var(--muted); font-size:12px; line-height:1.45; }
+    .kpi-pair { display:flex; justify-content:space-between; gap:10px; margin-top:10px; padding-top:10px; border-top:1px solid #eef2f7; color:var(--muted); font-size:12px; line-height:1.45; }
+    .kpi-pair strong { color:var(--ink); white-space:nowrap; }
+    .kpi-pair .better { color:var(--green); }
+    .kpi-pair .worse { color:var(--red); }
+    .positive { color:var(--green); } .negative { color:var(--red); } .blue { color:var(--blue); }
+    section { margin-top:20px; }
+    .section-head { display:flex; justify-content:space-between; align-items:center; gap:16px; margin:8px 0 12px; }
+    h2 { margin:0; font-size:20px; letter-spacing:0; }
+    .note { color:var(--muted); font-size:13px; line-height:1.6; }
+    .summary-grid { grid-template-columns:1.05fr .95fr; }
+    .panel-pad { padding:18px; }
+    .callouts { display:grid; gap:10px; }
+    .callout { border-left:4px solid var(--blue); background:#f8fbff; padding:12px 14px; border-radius:6px; line-height:1.6; font-size:14px; }
+    .callout.warn { border-left-color:var(--amber); background:#fffaf0; }
+    .callout.good { border-left-color:var(--green); background:#f3fbf5; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th { text-align:left; color:#475569; background:#f1f5f9; border-bottom:1px solid var(--line); padding:10px 10px; white-space:nowrap; }
+    td { border-bottom:1px solid #eef2f7; padding:10px 10px; vertical-align:top; white-space:nowrap; }
+    td.wrap { white-space:normal; line-height:1.5; }
+    tr:hover td { background:#fbfdff; }
+    .matrix td:nth-child(n+3), .matrix th:nth-child(n+3), .num { text-align:right; }
+    .tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+    .tab { appearance:none; border:1px solid var(--line); background:#fff; color:var(--slate); border-radius:6px; padding:9px 12px; font-weight:650; cursor:pointer; }
+    .tab.active { background:var(--ink); color:#fff; border-color:var(--ink); }
+    .compare-layout { display:grid; grid-template-columns:340px 1fr; gap:16px; align-items:start; }
+    .side-metrics { display:grid; gap:10px; }
+    .metric-line { display:flex; justify-content:space-between; gap:14px; padding:10px 0; border-bottom:1px solid #eef2f7; }
+    .metric-line span:first-child { color:var(--muted); }
+    .metric-line strong { text-align:right; }
+    .chart-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .chart-card { padding:16px; min-height:360px; }
+    .chart-title { font-weight:750; font-size:15px; margin-bottom:4px; }
+    .chart-subtitle { color:var(--muted); font-size:12px; margin-bottom:10px; }
+    svg { width:100%; height:280px; display:block; overflow:visible; }
+    .axis { stroke:#cbd5e1; stroke-width:1; }
+    .gridline { stroke:#e8eef6; stroke-width:1; }
+    .line-new { fill:none; stroke:var(--blue); stroke-width:2.6; }
+    .line-old { fill:none; stroke:var(--amber); stroke-width:2.6; }
+    .dot-new { fill:var(--blue); stroke:#fff; stroke-width:1.5; }
+    .dot-old { fill:var(--amber); stroke:#fff; stroke-width:1.5; }
+    .bar-pos { fill:#22c55e; } .bar-neg { fill:#ef4444; }
+    .legend { display:flex; gap:14px; align-items:center; color:var(--muted); font-size:12px; margin-top:6px; }
+    .legend i { width:10px; height:10px; display:inline-block; border-radius:50%; margin-right:5px; }
+    .data-table-wrap { overflow:auto; max-height:520px; border:1px solid var(--line); border-radius:8px; }
+    .data-table th { position:sticky; top:0; z-index:1; }
+    .pill { display:inline-block; min-width:54px; text-align:center; padding:4px 7px; border-radius:6px; font-weight:700; font-size:12px; }
+    .pill.good { background:#dcfce7; color:#166534; } .pill.bad { background:#fee2e2; color:#991b1b; }
+    .small { font-size:12px; color:var(--muted); }
+    footer { margin-top:34px; color:var(--muted); font-size:12px; line-height:1.6; }
+    @media (max-width:1100px) { .kpis,.summary-grid,.chart-grid,.compare-layout { grid-template-columns:1fr; } header { grid-template-columns:1fr; } .badge-row { justify-content:flex-start; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div>
+        <h1>Meta 渠道 Zikzik CPA 同期对比分析 Dashboard</h1>
+        <div class="subtitle">目标：判断 Zikzik 在 meta 渠道内相对老包的 CPA 趋势、CPA 节省金额、订阅效率和含后续毛利表现。CPA 使用 <strong>消耗 / 订阅次数</strong> 计算；当前有效窗口为 <strong>2026-05-19 至 2026-06-02</strong>，共 15 天；其中 CoupleLens 对比剔除 2026-05-29 异常日。</div>
+      </div>
+      <div class="badge-row">
+        <span class="badge">渠道：meta</span>
+        <span class="badge">新包：Zikzik</span>
+        <span class="badge">主对比：Usgen</span>
+        <span class="badge">稳健性：Dradra / CoupleLens / 老包池</span>
+      </div>
+    </header>
+
+    <div class="grid kpis" id="kpis"></div>
+
+    <section class="grid summary-grid">
+      <div class="card panel-pad">
+        <div class="section-head"><h2>结论摘要</h2></div>
+        <div class="callouts">
+          <div class="callout good"><strong>CPA 视角：</strong>本看板不再以安装 CPI 为核心，而是观察 Zikzik 获取一次订阅的成本，即 CPA。</div>
+          <div class="callout"><strong>成本节省口径：</strong>CPA 节省 = Zikzik 当日订阅次数 × (老包当日 CPA - Zikzik 当日 CPA)，正数表示 Zikzik 获取同等订阅更省钱。</div>
+          <div class="callout warn"><strong>与 CPI 结论可能不同：</strong>CPI 衡量安装成本，CPA 衡量订阅获取成本；若订阅率变化明显，两者结论可能不同。</div>
+          <div class="callout warn"><strong>口径限制：</strong>素材相似性无法从当前表字段验证；CoupleLens 对比继续剔除 2026-05-29 异常日，保持与主报告一致。</div>
+        </div>
+      </div>
+      <div class="card panel-pad">
+        <div class="section-head"><h2>样本口径</h2></div>
+        <table>
+          <tbody>
+            <tr><th>新包定义</th><td class="wrap">在数据窗口中较晚首次出现，且可从上线早期开始观察。当前可连续分析样本为 Zikzik。</td></tr>
+            <tr><th>老包定义</th><td class="wrap">同渠道、早于新包至少约 30 天开始投放，并且在观察期内持续投放。</td></tr>
+            <tr><th>同期定义</th><td class="wrap">老包取与 Zikzik 完全相同的自然日期：2026-05-19 至 2026-06-02；CoupleLens 对比剔除 2026-05-29 异常日。</td></tr>
+            <tr><th>CPA 定义</th><td class="wrap">CPA = 消耗 / 订阅次数，对应当前数据表中的订阅成本口径。</td></tr>
+            <tr><th>收益口径</th><td class="wrap">每日 CPA 节省 = Zikzik 当日订阅次数 × (老包当日 CPA - Zikzik 当日 CPA)，按日求和。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>核心对比矩阵</h2>
+        <div class="note">红色负数表示 Zikzik 在 CPA 口径下反而更贵；CPA 越低越好，订阅率和 ROI 越高越好。</div>
+      </div>
+      <div class="card data-table-wrap"><table class="matrix" id="matrix"></table></div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>分组可视化对比</h2>
+        <div class="note">切换老包对象后，下方曲线、柱状图和每日明细会同步更新。</div>
+      </div>
+      <div class="tabs" id="tabs"></div>
+      <div class="compare-layout">
+        <aside class="card panel-pad">
+          <h2 id="pairTitle">Zikzik vs Usgen</h2>
+          <div class="small" id="pairNote"></div>
+          <div class="side-metrics" id="sideMetrics"></div>
+        </aside>
+        <div class="chart-grid">
+          <div class="card chart-card"><div class="chart-title">每日 CPA 曲线</div><div class="chart-subtitle">Zikzik 和老包同日期直接对比，点位标注为每日 CPA。</div><div id="chartCpi"></div></div>
+          <div class="card chart-card"><div class="chart-title">每日节省金额</div><div class="chart-subtitle">绿色为新包更省，红色为新包更贵。</div><div id="chartSaving"></div></div>
+          <div class="card chart-card"><div class="chart-title">每日安装 CPI 参考</div><div class="chart-subtitle">保留安装成本背景，核心判断以 CPA 为准。</div><div id="chartSubCost"></div></div>
+          <div class="card chart-card"><div class="chart-title">每日订阅率</div><div class="chart-subtitle">订阅率越高说明安装后的转化质量越好。</div><div id="chartSubRate"></div></div>
+          <div class="card chart-card"><div class="chart-title">每日含后续毛利 ROI</div><div class="chart-subtitle">含后续预估毛利润 / 当日消耗。</div><div id="chartRoi"></div></div>
+          <div class="card chart-card"><div class="chart-title">每日 CPA 差值</div><div class="chart-subtitle">老包 CPA - Zikzik CPA；高于 0 代表 Zikzik 领先。</div><div id="chartDiff"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>每日明细表</h2><div class="note">保留所有每日关键指标，便于追溯每个波动点。</div></div>
+      <div class="card data-table-wrap"><table class="data-table" id="dailyTable"></table></div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>meta 包体覆盖背景</h2><div class="note">用于说明候选新包/老包的上线时间、覆盖天数和累计规模。</div></div>
+      <div class="card data-table-wrap"><table class="data-table" id="coverageTable"></table></div>
+    </section>
+
+    <footer>数据来源：query_result_2026-06-02T15_23_07.366161+08_00 (1).xlsx。CPA 使用“消耗 / 订阅次数”重新计算，安装 CPI 仅作为参考指标。</footer>
+  </div>
+  <script>
+    const DATA = {"summary": [{"old": "Usgen", "days": 15, "start": "2026-05-19", "end": "2026-06-02", "advDays": 14, "advPct": 0.9333333333333333, "newSpend": 65662.19, "oldSpend": 162993.22999999998, "newInstalls": 367920.0, "oldInstalls": 855270.0, "newCpi": 2.7848922724573755, "oldCpi": 3.068281126463612, "newInstallCpi": 0.17846866166557948, "oldInstallCpi": 0.19057517509090693, "saving": 10828.779829822834, "newSubs": 23578.0, "oldSubs": 53122.0, "newSubRate": 0.06408458360513156, "oldSubRate": 0.062111380032036666, "newSubCost": 2.7848922724573755, "oldSubCost": 3.068281126463612, "newGross": 47545.74999999999, "oldGross": 92444.28, "newRoi": 0.7240963178352716, "oldRoi": 0.5671663786281186}, {"old": "Dradra", "days": 15, "start": "2026-05-19", "end": "2026-06-02", "advDays": 13, "advPct": 0.8666666666666667, "newSpend": 65662.19, "oldSpend": 119469.92, "newInstalls": 367920.0, "oldInstalls": 741723.0, "newCpi": 2.7848922724573755, "oldCpi": 3.077059702261371, "newInstallCpi": 0.17846866166557948, "oldInstallCpi": 0.16107080406027588, "saving": 10866.743281084135, "newSubs": 23578.0, "oldSubs": 38826.0, "newSubRate": 0.06408458360513156, "oldSubRate": 0.05234568700175133, "newSubCost": 2.7848922724573755, "oldSubCost": 3.077059702261371, "newGross": 47545.74999999999, "oldGross": 67233.70000000001, "newRoi": 0.7240963178352716, "oldRoi": 0.5627667617087214}, {"old": "CoupleLens", "days": 14, "start": "2026-05-19", "end": "2026-06-02", "advDays": 8, "advPct": 0.5714285714285714, "newSpend": 59151.48, "oldSpend": 140771.72999999998, "newInstalls": 334709.0, "oldInstalls": 963459.0, "newCpi": 2.779152414959594, "oldCpi": 2.846748837209302, "newInstallCpi": 0.1767250955307446, "oldInstallCpi": 0.14611076340560417, "saving": 615.7132726786907, "newSubs": 21284.0, "oldSubs": 49450.0, "newSubRate": 0.0635895658616888, "oldSubRate": 0.05132548453021872, "newSubCost": 2.779152414959594, "oldSubCost": 2.846748837209302, "newGross": 43038.939999999995, "oldGross": 96735.06999999999, "newRoi": 0.7276054631261972, "oldRoi": 0.6871768216530407}, {"old": "老包池", "days": 15, "start": "2026-05-19", "end": "2026-06-02", "advDays": 13, "advPct": 0.8666666666666667, "newSpend": 65662.19, "oldSpend": 423234.88, "newInstalls": 367920.0, "oldInstalls": 2560452.0, "newCpi": 2.7848922724573755, "oldCpi": 2.993216877183553, "newInstallCpi": 0.17846866166557948, "oldInstallCpi": 0.16529693975907378, "saving": 7320.798048067647, "newSubs": 23578.0, "oldSubs": 141398.0, "newSubRate": 0.06408458360513156, "oldSubRate": 0.05522384329016908, "newSubCost": 2.7848922724573755, "oldSubCost": 2.993216877183553, "newGross": 47545.74999999999, "oldGross": 256413.04999999993, "newRoi": 0.7240963178352716, "oldRoi": 0.6058410166950321}], "daily": {"Usgen": [{"old": "Usgen", "dayNo": 1, "date": "05-19", "fullDate": "2026-05-19", "newCpi": 6.142608695652174, "oldCpi": 2.5568754894283474, "newInstallCpi": 0.10289876183539694, "oldInstallCpi": 0.15429212739816653, "cpiDiff": -3.5857332062238267, "saving": -82.47186374314802, "newInstalls": 1373.0, "newActions": 23.0, "newSpend": 141.28, "oldSpend": 9795.39, "newSubCost": 6.142608695652174, "oldSubCost": 2.5568754894283474, "newSubRate": 0.016751638747268753, "oldSubRate": 0.060344012853227484, "newRoi": -0.2046998867497169, "oldRoi": 0.8756180203136374, "newGross": -28.92, "oldGross": 8577.02}, {"old": "Usgen", "dayNo": 2, "date": "05-20", "fullDate": "2026-05-20", "newCpi": 2.0029787234042553, "oldCpi": 2.6383944153577663, "newInstallCpi": 0.11440376727935592, "oldInstallCpi": 0.164943343880048, "cpiDiff": 0.635415691953511, "saving": 238.91630017452013, "newInstalls": 6583.0, "newActions": 376.0, "newSpend": 753.12, "oldSpend": 10582.6, "newSubCost": 2.0029787234042553, "oldSubCost": 2.6383944153577663, "newSubRate": 0.05711681604131855, "oldSubRate": 0.06251656042020605, "newRoi": 1.3873751858933503, "oldRoi": 0.8184387579611815, "newGross": 1044.86, "oldGross": 8661.21}, {"old": "Usgen", "dayNo": 3, "date": "05-21", "fullDate": "2026-05-21", "newCpi": 2.0462172284644193, "oldCpi": 2.771965888689407, "newInstallCpi": 0.12758991125642224, "oldInstallCpi": 0.16880148686691993, "cpiDiff": 0.7257486602249879, "saving": 581.3246768402153, "newInstalls": 12846.0, "newActions": 801.0, "newSpend": 1639.02, "oldSpend": 12351.88, "newSubCost": 2.0462172284644193, "oldSubCost": 2.771965888689407, "newSubRate": 0.062354040168145726, "oldSubRate": 0.0608959466477164, "newRoi": 1.3374638503495992, "oldRoi": 0.732019741124428, "newGross": 2192.13, "oldGross": 9041.82}, {"old": "Usgen", "dayNo": 4, "date": "05-22", "fullDate": "2026-05-22", "newCpi": 2.4004573438874233, "oldCpi": 2.8158807769591427, "newInstallCpi": 0.1280529229614338, "oldInstallCpi": 0.17297067858906137, "cpiDiff": 0.4154234330717195, "saving": 472.33644340254506, "newInstalls": 21314.0, "newActions": 1137.0, "newSpend": 2729.32, "oldSpend": 12612.33, "newSubCost": 2.4004573438874233, "oldSubCost": 2.8158807769591427, "newSubRate": 0.05334521910481374, "oldSubRate": 0.0614268473311756, "newRoi": 0.9962078466431198, "oldRoi": 0.7053978130924261, "newGross": 2718.97, "oldGross": 8896.71}, {"old": "Usgen", "dayNo": 5, "date": "05-23", "fullDate": "2026-05-23", "newCpi": 2.3440317919075144, "oldCpi": 2.880703669298653, "newInstallCpi": 0.14575163985982567, "oldInstallCpi": 0.17622762402682274, "cpiDiff": 0.5366718773911385, "saving": 742.7538783093357, "newInstalls": 22258.0, "newActions": 1384.0, "newSpend": 3244.14, "oldSpend": 12404.31, "newSubCost": 2.3440317919075144, "oldSubCost": 2.880703669298653, "newSubRate": 0.062179890376493845, "oldSubRate": 0.06117520031823606, "newRoi": 1.0436571787900646, "oldRoi": 0.6675848958950559, "newGross": 3385.77, "oldGross": 8280.93}, {"old": "Usgen", "dayNo": 6, "date": "05-24", "fullDate": "2026-05-24", "newCpi": 2.608672622846203, "oldCpi": 3.0816510837229067, "newInstallCpi": 0.1900148747269093, "oldInstallCpi": 0.2052311676549255, "cpiDiff": 0.4729784608767038, "saving": 741.1572481937949, "newInstalls": 21513.0, "newActions": 1567.0, "newSpend": 4087.79, "oldSpend": 14502.25, "newSubCost": 2.608672622846203, "oldSubCost": 3.0816510837229067, "newSubRate": 0.07283967833403059, "oldSubRate": 0.06659779516861725, "newRoi": 0.8388738169035101, "oldRoi": 0.5604757882397559, "newGross": 3429.14, "oldGross": 8128.16}, {"old": "Usgen", "dayNo": 7, "date": "05-25", "fullDate": "2026-05-25", "newCpi": 2.751774779449922, "oldCpi": 3.3142288426047983, "newInstallCpi": 0.17404063279506368, "oldInstallCpi": 0.1995724650335773, "cpiDiff": 0.5624540631548762, "saving": 1083.8489796994465, "newInstalls": 30468.0, "newActions": 1927.0, "newSpend": 5302.67, "oldSpend": 12570.87, "newSubCost": 2.751774779449922, "oldSubCost": 3.3142288426047983, "newSubRate": 0.06324668504660627, "oldSubRate": 0.06021686326183937, "newRoi": 0.7445456722745334, "oldRoi": 0.45272284257175516, "newGross": 3948.08, "oldGross": 5691.12}, {"old": "Usgen", "dayNo": 8, "date": "05-26", "fullDate": "2026-05-26", "newCpi": 2.672561166059344, "oldCpi": 3.092333425490738, "newInstallCpi": 0.16658522340114865, "oldInstallCpi": 0.19546967022596598, "cpiDiff": 0.4197722594313942, "saving": 806.3825103677082, "newInstalls": 30819.0, "newActions": 1921.0, "newSpend": 5133.99, "oldSpend": 11184.97, "newSubCost": 2.672561166059344, "oldSubCost": 3.092333425490738, "newSubRate": 0.062331678510010056, "oldSubRate": 0.06321105887698572, "newRoi": 0.7955118728318521, "oldRoi": 0.555170912394043, "newGross": 4084.15, "oldGross": 6209.57}, {"old": "Usgen", "dayNo": 9, "date": "05-27", "fullDate": "2026-05-27", "newCpi": 2.8213204819277107, "oldCpi": 3.290870786516854, "newInstallCpi": 0.17696148963182395, "oldInstallCpi": 0.20518950539442343, "cpiDiff": 0.46955030458914315, "saving": 974.316882022472, "newInstalls": 33082.0, "newActions": 2075.0, "newSpend": 5854.24, "oldSpend": 11715.5, "newSubCost": 2.8213204819277107, "oldSubCost": 3.290870786516854, "newSubRate": 0.06272293089897829, "oldSubRate": 0.062351127924898414, "newRoi": 0.7021577523299353, "oldRoi": 0.46285689897998383, "newGross": 4110.6, "oldGross": 5422.6}, {"old": "Usgen", "dayNo": 10, "date": "05-28", "fullDate": "2026-05-28", "newCpi": 2.7265402641670216, "oldCpi": 3.1145456872280524, "newInstallCpi": 0.18704518882263532, "oldInstallCpi": 0.19576772096914316, "cpiDiff": 0.3880054230610308, "saving": 910.6487279242393, "newInstalls": 34212.0, "newActions": 2347.0, "newSpend": 6399.19, "oldSpend": 12168.53, "newSubCost": 2.7265402641670216, "oldSubCost": 3.1145456872280524, "newSubRate": 0.06860166023617444, "oldSubRate": 0.06285594774606648, "newRoi": 0.7604587455599849, "oldRoi": 0.5442588381669766, "newGross": 4866.32, "oldGross": 6622.83}, {"old": "Usgen", "dayNo": 11, "date": "05-29", "fullDate": "2026-05-29", "newCpi": 2.8381473408892766, "oldCpi": 3.2291599871753767, "newInstallCpi": 0.196040769624522, "oldInstallCpi": 0.21514856984171063, "cpiDiff": 0.3910126462861001, "saving": 896.9830105803137, "newInstalls": 33211.0, "newActions": 2294.0, "newSpend": 6510.71, "oldSpend": 10071.75, "newSubCost": 2.8381473408892766, "oldSubCost": 3.2291599871753767, "newSubRate": 0.0690734997440607, "oldSubRate": 0.06662679170315938, "newRoi": 0.6922148275687291, "oldRoi": 0.490334847469407, "newGross": 4506.81, "oldGross": 4938.53}, {"old": "Usgen", "dayNo": 12, "date": "05-30", "fullDate": "2026-05-30", "newCpi": 3.0563703703703706, "oldCpi": 3.5383119200571023, "newInstallCpi": 0.21767871274070166, "oldInstallCpi": 0.2344815760843858, "cpiDiff": 0.48194154968673164, "saving": 1040.9937473233404, "newInstalls": 30328.0, "newActions": 2160.0, "newSpend": 6601.76, "oldSpend": 9914.35, "newSubCost": 3.0563703703703706, "oldSubCost": 3.5383119200571023, "newSubRate": 0.07122131363756265, "oldSubRate": 0.06626933446856818, "newRoi": 0.5731759409611982, "oldRoi": 0.3623041349155517, "newGross": 3783.97, "oldGross": 3592.01}, {"old": "Usgen", "dayNo": 13, "date": "05-31", "fullDate": "2026-05-31", "newCpi": 3.1365769554247267, "oldCpi": 3.617035739313245, "newInstallCpi": 0.19670297212479232, "oldInstallCpi": 0.21909332088205957, "cpiDiff": 0.48045878388851815, "saving": 1142.530988086896, "newInstalls": 37919.0, "newActions": 2378.0, "newSpend": 7458.78, "oldSpend": 10323.02, "newSubCost": 3.1365769554247267, "oldSubCost": 3.617035739313245, "newSubRate": 0.0627126242780664, "oldSubRate": 0.06057261710210752, "newRoi": 0.5335872622600479, "oldRoi": 0.33319803700854983, "newGross": 3979.91, "oldGross": 3439.61}, {"old": "Usgen", "dayNo": 14, "date": "06-01", "fullDate": "2026-06-01", "newCpi": 2.98993947858473, "oldCpi": 3.5389060593737294, "newInstallCpi": 0.1905923375968187, "oldInstallCpi": 0.2043962419260129, "cpiDiff": 0.5489665807889992, "saving": 1179.1802155347702, "newInstalls": 33697.0, "newActions": 2148.0, "newSpend": 6422.39, "oldSpend": 8702.17, "newSubCost": 2.98993947858473, "oldSubCost": 3.5389060593737294, "newSubRate": 0.06374454699231386, "oldSubRate": 0.05775689958896066, "newRoi": 0.6075744387992632, "oldRoi": 0.3620798030835987, "newGross": 3902.08, "oldGross": 3150.88}, {"old": "Usgen", "dayNo": 15, "date": "06-02", "fullDate": "2026-06-02", "newCpi": 3.253644230769231, "oldCpi": 3.34968085106383, "newInstallCpi": 0.1849368748975242, "oldInstallCpi": 0.18410965681644403, "cpiDiff": 0.09603662029459903, "saving": 99.878085106383, "newInstalls": 18297.0, "newActions": 1040.0, "newSpend": 3383.79, "oldSpend": 4093.31, "newSubCost": 3.253644230769231, "oldSubCost": 3.34968085106383, "newSubRate": 0.0568399191124228, "oldSubRate": 0.054963342778752304, "newRoi": 0.47930870414535187, "oldRoi": 0.4376116150499229, "newGross": 1621.88, "oldGross": 1791.28}], "Dradra": [{"old": "Dradra", "dayNo": 1, "date": "05-19", "fullDate": "2026-05-19", "newCpi": 6.142608695652174, "oldCpi": 2.477615336658354, "newInstallCpi": 0.10289876183539694, "oldInstallCpi": 0.12263075878668188, "cpiDiff": -3.66499335899382, "saving": -84.29484725685786, "newInstalls": 1373.0, "newActions": 23.0, "newSpend": 141.28, "oldSpend": 7948.19, "newSubCost": 6.142608695652174, "oldSubCost": 2.477615336658354, "newSubRate": 0.016751638747268753, "oldSubRate": 0.049495479371740675, "newRoi": -0.2046998867497169, "oldRoi": 0.9348203804891428, "newGross": -28.92, "oldGross": 7430.13}, {"old": "Dradra", "dayNo": 2, "date": "05-20", "fullDate": "2026-05-20", "newCpi": 2.0029787234042553, "oldCpi": 2.7020519877675837, "newInstallCpi": 0.11440376727935592, "oldInstallCpi": 0.1329277869715661, "cpiDiff": 0.6990732643633284, "saving": 262.8515474006115, "newInstalls": 6583.0, "newActions": 376.0, "newSpend": 753.12, "oldSpend": 8835.71, "newSubCost": 2.0029787234042553, "oldSubCost": 2.7020519877675837, "newSubRate": 0.05711681604131855, "oldSubRate": 0.04919512562058071, "newRoi": 1.3873751858933503, "oldRoi": 0.7761877653295548, "newGross": 1044.86, "oldGross": 6858.17}, {"old": "Dradra", "dayNo": 3, "date": "05-21", "fullDate": "2026-05-21", "newCpi": 2.0462172284644193, "oldCpi": 2.9689795918367348, "newInstallCpi": 0.12758991125642224, "oldInstallCpi": 0.14136803413747942, "cpiDiff": 0.9227623633723154, "saving": 739.1326530612247, "newInstalls": 12846.0, "newActions": 801.0, "newSpend": 1639.02, "oldSpend": 10038.12, "newSubCost": 2.0462172284644193, "oldSubCost": 2.9689795918367348, "newSubRate": 0.062354040168145726, "oldSubRate": 0.04761502387088597, "newRoi": 1.3374638503495992, "oldRoi": 0.6187463389559, "newGross": 2192.13, "oldGross": 6211.05}, {"old": "Dradra", "dayNo": 4, "date": "05-22", "fullDate": "2026-05-22", "newCpi": 2.4004573438874233, "oldCpi": 2.9422740356937247, "newInstallCpi": 0.1280529229614338, "oldInstallCpi": 0.14527786463515163, "cpiDiff": 0.5418166918063014, "saving": 616.0455785837647, "newInstalls": 21314.0, "newActions": 1137.0, "newSpend": 2729.32, "oldSpend": 10221.46, "newSubCost": 2.4004573438874233, "oldSubCost": 2.9422740356937247, "newSubRate": 0.05334521910481374, "oldSubRate": 0.04937604821058018, "newRoi": 0.9962078466431198, "oldRoi": 0.6332118894952385, "newGross": 2718.97, "oldGross": 6472.35}, {"old": "Dradra", "dayNo": 5, "date": "05-23", "fullDate": "2026-05-23", "newCpi": 2.3440317919075144, "oldCpi": 3.0161003460207616, "newInstallCpi": 0.14575163985982567, "oldInstallCpi": 0.14500000000000002, "cpiDiff": 0.6720685541132472, "saving": 930.1428788927341, "newInstalls": 22258.0, "newActions": 1384.0, "newSpend": 3244.14, "oldSpend": 8716.53, "newSubCost": 2.3440317919075144, "oldSubCost": 3.0161003460207616, "newSubRate": 0.062179890376493845, "oldSubRate": 0.04807532355191802, "newRoi": 1.0436571787900646, "oldRoi": 0.5938475517206961, "newGross": 3385.77, "oldGross": 5176.29}, {"old": "Dradra", "dayNo": 6, "date": "05-24", "fullDate": "2026-05-24", "newCpi": 2.608672622846203, "oldCpi": 3.0376411226742355, "newInstallCpi": 0.1900148747269093, "oldInstallCpi": 0.16307515194609512, "cpiDiff": 0.42896849982803253, "saving": 672.193639230527, "newInstalls": 21513.0, "newActions": 1567.0, "newSpend": 4087.79, "oldSpend": 9632.36, "newSubCost": 2.608672622846203, "oldSubCost": 3.0376411226742355, "newSubRate": 0.07283967833403059, "oldSubRate": 0.05368479861851795, "newRoi": 0.8388738169035101, "oldRoi": 0.5827221989211366, "newGross": 3429.14, "oldGross": 5612.99}, {"old": "Dradra", "dayNo": 7, "date": "05-25", "fullDate": "2026-05-25", "newCpi": 2.751774779449922, "oldCpi": 3.2159018759018756, "newInstallCpi": 0.17404063279506368, "oldInstallCpi": 0.16636148175795465, "cpiDiff": 0.4641270964519535, "saving": 894.3729148629144, "newInstalls": 30468.0, "newActions": 1927.0, "newSpend": 5302.67, "oldSpend": 8914.48, "newSubCost": 2.751774779449922, "oldSubCost": 3.2159018759018756, "newSubRate": 0.06324668504660627, "oldSubRate": 0.051730894839973875, "newRoi": 0.7445456722745334, "oldRoi": 0.4963755597634411, "newGross": 3948.08, "oldGross": 4424.93}, {"old": "Dradra", "dayNo": 8, "date": "05-26", "fullDate": "2026-05-26", "newCpi": 2.672561166059344, "oldCpi": 3.147800766283525, "newInstallCpi": 0.16658522340114865, "oldInstallCpi": 0.17250939632545934, "cpiDiff": 0.47523960022418077, "saving": 912.9352720306513, "newInstalls": 30819.0, "newActions": 1921.0, "newSpend": 5133.99, "oldSpend": 8215.76, "newSubCost": 2.672561166059344, "oldSubCost": 3.147800766283525, "newSubRate": 0.062331678510010056, "oldSubRate": 0.054803149606299215, "newRoi": 0.7955118728318521, "oldRoi": 0.5282079807589316, "newGross": 4084.15, "oldGross": 4339.63}, {"old": "Dradra", "dayNo": 9, "date": "05-27", "fullDate": "2026-05-27", "newCpi": 2.8213204819277107, "oldCpi": 3.2215830416180475, "newInstallCpi": 0.17696148963182395, "oldInstallCpi": 0.17846009652676034, "cpiDiff": 0.40026255969033686, "saving": 830.544811357449, "newInstalls": 33082.0, "newActions": 2075.0, "newSpend": 5854.24, "oldSpend": 8282.69, "newSubCost": 2.8213204819277107, "oldSubCost": 3.2215830416180475, "newSubRate": 0.06272293089897829, "oldSubRate": 0.055395156425062486, "newRoi": 0.7021577523299353, "oldRoi": 0.493781609597848, "newGross": 4110.6, "oldGross": 4089.84}, {"old": "Dradra", "dayNo": 10, "date": "05-28", "fullDate": "2026-05-28", "newCpi": 2.7265402641670216, "oldCpi": 3.1458927173061864, "newInstallCpi": 0.18704518882263532, "oldInstallCpi": 0.1801482062780269, "cpiDiff": 0.4193524531391648, "saving": 984.2202075176198, "newInstalls": 34212.0, "newActions": 2347.0, "newSpend": 6399.19, "oldSpend": 8034.61, "newSubCost": 2.7265402641670216, "oldSubCost": 3.1458927173061864, "newSubRate": 0.06860166023617444, "oldSubRate": 0.05726457399103139, "newRoi": 0.7604587455599849, "oldRoi": 0.5291196461309261, "newGross": 4866.32, "oldGross": 4251.27}, {"old": "Dradra", "dayNo": 11, "date": "05-29", "fullDate": "2026-05-29", "newCpi": 2.8381473408892766, "oldCpi": 3.1787266939517966, "newInstallCpi": 0.196040769624522, "oldInstallCpi": 0.19144970009038373, "cpiDiff": 0.3405793530625201, "saving": 781.2890359254211, "newInstalls": 33211.0, "newActions": 2294.0, "newSpend": 6510.71, "oldSpend": 6990.02, "newSubCost": 2.8381473408892766, "oldSubCost": 3.1787266939517966, "newSubRate": 0.0690734997440607, "oldSubRate": 0.060228424310481775, "newRoi": 0.6922148275687291, "oldRoi": 0.513583652121167, "newGross": 4506.81, "oldGross": 3589.96}, {"old": "Dradra", "dayNo": 12, "date": "05-30", "fullDate": "2026-05-30", "newCpi": 3.0563703703703706, "oldCpi": 3.4202947368421053, "newInstallCpi": 0.21767871274070166, "oldInstallCpi": 0.2182995733817058, "cpiDiff": 0.36392436647173465, "saving": 786.0766315789468, "newInstalls": 30328.0, "newActions": 2160.0, "newSpend": 6601.76, "oldSpend": 6498.56, "newSubCost": 3.0563703703703706, "oldSubCost": 3.4202947368421053, "newSubRate": 0.07122131363756265, "oldSubRate": 0.06382478417145353, "newRoi": 0.5731759409611982, "oldRoi": 0.408447409887729, "newGross": 3783.97, "oldGross": 2654.32}, {"old": "Dradra", "dayNo": 13, "date": "05-31", "fullDate": "2026-05-31", "newCpi": 3.1365769554247267, "oldCpi": 3.5786697459584293, "newInstallCpi": 0.19670297212479232, "oldInstallCpi": 0.1938602812390532, "cpiDiff": 0.44209279053370265, "saving": 1051.2966558891449, "newInstalls": 37919.0, "newActions": 2378.0, "newSpend": 7458.78, "oldSpend": 7747.82, "newSubCost": 3.1365769554247267, "oldSubCost": 3.5786697459584293, "newSubRate": 0.0627126242780664, "oldSubRate": 0.054171045388580294, "newRoi": 0.5335872622600479, "oldRoi": 0.3472228317126624, "newGross": 3979.91, "oldGross": 2690.22}, {"old": "Dradra", "dayNo": 14, "date": "06-01", "fullDate": "2026-06-01", "newCpi": 2.98993947858473, "oldCpi": 3.685128504672897, "newInstallCpi": 0.1905923375968187, "oldInstallCpi": 0.1921641131857086, "cpiDiff": 0.6951890260881668, "saving": 1493.2660280373823, "newInstalls": 33697.0, "newActions": 2148.0, "newSpend": 6422.39, "oldSpend": 6308.94, "newSubCost": 2.98993947858473, "oldSubCost": 3.685128504672897, "newSubRate": 0.06374454699231386, "oldSubRate": 0.05214583777527337, "newRoi": 0.6075744387992632, "oldRoi": 0.3090265559666125, "newGross": 3902.08, "oldGross": 1949.63}, {"old": "Dradra", "dayNo": 15, "date": "06-02", "fullDate": "2026-06-02", "newCpi": 3.253644230769231, "oldCpi": 3.2504425711275027, "newInstallCpi": 0.1849368748975242, "oldInstallCpi": 0.16589598795310315, "cpiDiff": -0.0032016596417281384, "saving": -3.329726027397264, "newInstalls": 18297.0, "newActions": 1040.0, "newSpend": 3383.79, "oldSpend": 3084.67, "newSubCost": 3.253644230769231, "oldSubCost": 3.2504425711275027, "newSubRate": 0.0568399191124228, "oldSubRate": 0.0510379692373884, "newRoi": 0.47930870414535187, "oldRoi": 0.4807386203386424, "newGross": 1621.88, "oldGross": 1482.92}], "CoupleLens": [{"old": "CoupleLens", "dayNo": 1, "date": "05-19", "fullDate": "2026-05-19", "newCpi": 6.142608695652174, "oldCpi": 2.7570130464637215, "newInstallCpi": 0.10289876183539694, "oldInstallCpi": 0.1396583148790131, "cpiDiff": -3.3855956491884527, "saving": -77.86869993133442, "newInstalls": 1373.0, "newActions": 23.0, "newSpend": 141.28, "oldSpend": 12045.39, "newSubCost": 6.142608695652174, "oldSubCost": 2.7570130464637215, "newSubRate": 0.016751638747268753, "oldSubRate": 0.05065565977576551, "newRoi": -0.2046998867497169, "oldRoi": 0.7412777834507641, "newGross": -28.92, "oldGross": 8928.98}, {"old": "CoupleLens", "dayNo": 2, "date": "05-20", "fullDate": "2026-05-20", "newCpi": 2.0029787234042553, "oldCpi": 2.7562474367737524, "newInstallCpi": 0.11440376727935592, "oldInstallCpi": 0.14118023947902808, "cpiDiff": 0.7532687133694971, "saving": 283.22903622693093, "newInstalls": 6583.0, "newActions": 376.0, "newSpend": 753.12, "oldSpend": 12097.17, "newSubCost": 2.0029787234042553, "oldSubCost": 2.7562474367737524, "newSubRate": 0.05711681604131855, "oldSubRate": 0.05122190322806526, "newRoi": 1.3873751858933503, "oldRoi": 0.7417544764601968, "newGross": 1044.86, "oldGross": 8973.13}, {"old": "CoupleLens", "dayNo": 3, "date": "05-21", "fullDate": "2026-05-21", "newCpi": 2.0462172284644193, "oldCpi": 2.780199270959903, "newInstallCpi": 0.12758991125642224, "oldInstallCpi": 0.13774797119946058, "cpiDiff": 0.7339820424954837, "saving": 587.9196160388824, "newInstalls": 12846.0, "newActions": 801.0, "newSpend": 1639.02, "oldSpend": 11440.52, "newSubCost": 2.0462172284644193, "oldSubCost": 2.780199270959903, "newSubRate": 0.062354040168145726, "oldSubRate": 0.049546078454981095, "newRoi": 1.3374638503495992, "oldRoi": 0.7269643337890236, "newGross": 2192.13, "oldGross": 8316.85}, {"old": "CoupleLens", "dayNo": 4, "date": "05-22", "fullDate": "2026-05-22", "newCpi": 2.4004573438874233, "oldCpi": 2.9531414012738852, "newInstallCpi": 0.1280529229614338, "oldInstallCpi": 0.14302912142152024, "cpiDiff": 0.552684057386462, "saving": 628.4017732484073, "newInstalls": 21314.0, "newActions": 1137.0, "newSpend": 2729.32, "oldSpend": 11591.08, "newSubCost": 2.4004573438874233, "oldSubCost": 2.9531414012738852, "newSubRate": 0.05334521910481374, "oldSubRate": 0.04843287265547878, "newRoi": 0.9962078466431198, "oldRoi": 0.6272935740241634, "newGross": 2718.97, "oldGross": 7271.01}, {"old": "CoupleLens", "dayNo": 5, "date": "05-23", "fullDate": "2026-05-23", "newCpi": 2.3440317919075144, "oldCpi": 3.000990016638935, "newInstallCpi": 0.14575163985982567, "oldInstallCpi": 0.14118713061176563, "cpiDiff": 0.6569582247314205, "saving": 909.230183028286, "newInstalls": 22258.0, "newActions": 1384.0, "newSpend": 3244.14, "oldSpend": 10821.57, "newSubCost": 2.3440317919075144, "oldSubCost": 3.000990016638935, "newSubRate": 0.062179890376493845, "oldSubRate": 0.047046851148772946, "newRoi": 1.0436571787900646, "oldRoi": 0.6017463270116998, "newGross": 3385.77, "oldGross": 6511.84}, {"old": "CoupleLens", "dayNo": 6, "date": "05-24", "fullDate": "2026-05-24", "newCpi": 2.608672622846203, "oldCpi": 3.2306550218340613, "newInstallCpi": 0.1900148747269093, "oldInstallCpi": 0.16303410549239725, "cpiDiff": 0.6219823989878583, "saving": 974.646419213974, "newInstalls": 21513.0, "newActions": 1567.0, "newSpend": 4087.79, "oldSpend": 12576.94, "newSubCost": 2.608672622846203, "oldSubCost": 3.2306550218340613, "newSubRate": 0.07283967833403059, "oldSubRate": 0.05046472136162711, "newRoi": 0.8388738169035101, "oldRoi": 0.4896564665172927, "newGross": 3429.14, "oldGross": 6158.38}, {"old": "CoupleLens", "dayNo": 7, "date": "05-25", "fullDate": "2026-05-25", "newCpi": 2.751774779449922, "oldCpi": 3.288222852721176, "newInstallCpi": 0.17404063279506368, "oldInstallCpi": 0.15748925235953945, "cpiDiff": 0.536448073271254, "saving": 1033.7354371937065, "newInstalls": 30468.0, "newActions": 1927.0, "newSpend": 5302.67, "oldSpend": 12748.44, "newSubCost": 2.751774779449922, "oldSubCost": 3.288222852721176, "newSubRate": 0.06324668504660627, "oldSubRate": 0.047894944902900624, "newRoi": 0.7445456722745334, "oldRoi": 0.46401442058793074, "newGross": 3948.08, "oldGross": 5915.46}, {"old": "CoupleLens", "dayNo": 8, "date": "05-26", "fullDate": "2026-05-26", "newCpi": 2.672561166059344, "oldCpi": 3.0332680412371134, "newInstallCpi": 0.16658522340114865, "oldInstallCpi": 0.14495904617620614, "cpiDiff": 0.36070687517776934, "saving": 692.9179072164949, "newInstalls": 30819.0, "newActions": 1921.0, "newSpend": 5133.99, "oldSpend": 11769.08, "newSubCost": 2.672561166059344, "oldSubCost": 3.0332680412371134, "newSubRate": 0.062331678510010056, "oldSubRate": 0.04778972520908005, "newRoi": 0.7955118728318521, "oldRoi": 0.5849675590615409, "newGross": 4084.15, "oldGross": 6884.53}, {"old": "CoupleLens", "dayNo": 9, "date": "05-27", "fullDate": "2026-05-27", "newCpi": 2.8213204819277107, "oldCpi": 2.8706139256301473, "newInstallCpi": 0.17696148963182395, "oldInstallCpi": 0.14774893387453114, "cpiDiff": 0.0492934437024366, "saving": 102.28389568255595, "newInstalls": 33082.0, "newActions": 2075.0, "newSpend": 5854.24, "oldSpend": 11502.55, "newSubCost": 2.8213204819277107, "oldSubCost": 2.8706139256301473, "newSubRate": 0.06272293089897829, "oldSubRate": 0.05146945486307353, "newRoi": 0.7021577523299353, "oldRoi": 0.6733585161551134, "newGross": 4110.6, "oldGross": 7745.34}, {"old": "CoupleLens", "dayNo": 10, "date": "05-28", "fullDate": "2026-05-28", "newCpi": 2.7265402641670216, "oldCpi": 2.6375620821394463, "newInstallCpi": 0.18704518882263532, "oldInstallCpi": 0.14155690541181296, "cpiDiff": -0.08897818202757524, "saving": -208.83179321871907, "newInstalls": 34212.0, "newActions": 2347.0, "newSpend": 6399.19, "oldSpend": 11046.11, "newSubCost": 2.7265402641670216, "oldSubCost": 2.6375620821394463, "newSubRate": 0.06860166023617444, "oldSubRate": 0.0536696013225174, "newRoi": 0.7604587455599849, "oldRoi": 0.8190050615103416, "newGross": 4866.32, "oldGross": 9046.82}, {"old": "CoupleLens", "dayNo": 11, "date": "05-30", "fullDate": "2026-05-30", "newCpi": 3.0563703703703706, "oldCpi": 2.7653914327917284, "newInstallCpi": 0.21767871274070166, "oldInstallCpi": 0.16884650072150073, "cpiDiff": -0.29097893757864224, "saving": -628.5145051698672, "newInstalls": 30328.0, "newActions": 2160.0, "newSpend": 6601.76, "oldSpend": 5616.51, "newSubCost": 3.0563703703703706, "oldSubCost": 2.7653914327917284, "newSubRate": 0.07122131363756265, "oldSubRate": 0.06105699855699856, "newRoi": 0.5731759409611982, "oldRoi": 0.7360780983208433, "newGross": 3783.97, "oldGross": 4134.19}, {"old": "CoupleLens", "dayNo": 12, "date": "05-31", "fullDate": "2026-05-31", "newCpi": 3.1365769554247267, "oldCpi": 2.474982817869416, "newInstallCpi": 0.19670297212479232, "oldInstallCpi": 0.1447890052451706, "cpiDiff": -0.6615941375553107, "saving": -1573.2708591065289, "newInstalls": 37919.0, "newActions": 2378.0, "newSpend": 7458.78, "oldSpend": 7922.42, "newSubCost": 3.1365769554247267, "oldSubCost": 2.474982817869416, "newSubRate": 0.0627126242780664, "oldSubRate": 0.05850101430999507, "newRoi": 0.5335872622600479, "oldRoi": 0.9368513661229776, "newGross": 3979.91, "oldGross": 7422.13}, {"old": "CoupleLens", "dayNo": 13, "date": "06-01", "fullDate": "2026-06-01", "newCpi": 2.98993947858473, "oldCpi": 2.3941885441527444, "newInstallCpi": 0.1905923375968187, "oldInstallCpi": 0.14519684469532493, "cpiDiff": -0.5957509344319858, "saving": -1279.6730071599054, "newInstalls": 33697.0, "newActions": 2148.0, "newSpend": 6422.39, "oldSpend": 6018.99, "newSubCost": 2.98993947858473, "oldSubCost": 2.3941885441527444, "newSubRate": 0.06374454699231386, "oldSubRate": 0.06064553480966855, "newRoi": 0.6075744387992632, "oldRoi": 1.001369000446919, "newGross": 3902.08, "oldGross": 6027.23}, {"old": "CoupleLens", "dayNo": 14, "date": "06-02", "fullDate": "2026-06-02", "newCpi": 3.253644230769231, "oldCpi": 2.4570171821305844, "newInstallCpi": 0.1849368748975242, "oldInstallCpi": 0.13653744796241837, "cpiDiff": -0.7966270486386464, "saving": -828.4921305841923, "newInstalls": 18297.0, "newActions": 1040.0, "newSpend": 3383.79, "oldSpend": 3574.96, "newSubCost": 3.253644230769231, "oldSubCost": 2.4570171821305844, "newSubRate": 0.0568399191124228, "oldSubRate": 0.055570408280181796, "newRoi": 0.47930870414535187, "oldRoi": 0.9508302190793743, "newGross": 1621.88, "oldGross": 3399.18}], "老包池": [{"old": "老包池", "dayNo": 1, "date": "05-19", "fullDate": "2026-05-19", "newCpi": 6.142608695652174, "oldCpi": 2.611235098176718, "newInstallCpi": 0.10289876183539694, "oldInstallCpi": 0.13884459960195572, "cpiDiff": -3.531373597475456, "saving": -81.2215927419355, "newInstalls": 1373.0, "newActions": 23.0, "newSpend": 141.28, "oldSpend": 29788.969999999998, "newSubCost": 6.142608695652174, "oldSubCost": 2.611235098176718, "newSubRate": 0.016751638747268753, "oldSubRate": 0.053172002666057636, "newRoi": -0.2046998867497169, "oldRoi": 0.8370927225748324, "newGross": -28.92, "oldGross": 24936.13}, {"old": "老包池", "dayNo": 2, "date": "05-20", "fullDate": "2026-05-20", "newCpi": 2.0029787234042553, "oldCpi": 2.700555269922879, "newInstallCpi": 0.11440376727935592, "oldInstallCpi": 0.14569253172456834, "cpiDiff": 0.6975765465186239, "saving": 262.28878149100257, "newInstalls": 6583.0, "newActions": 376.0, "newSpend": 753.12, "oldSpend": 31515.48, "newSubCost": 2.0029787234042553, "oldSubCost": 2.700555269922879, "newSubRate": 0.05711681604131855, "oldSubRate": 0.053949102004021914, "newRoi": 1.3873751858933503, "oldRoi": 0.7771580823138343, "newGross": 1044.86, "oldGross": 24492.51}, {"old": "老包池", "dayNo": 3, "date": "05-21", "fullDate": "2026-05-21", "newCpi": 2.0462172284644193, "oldCpi": 2.8305321285140566, "newInstallCpi": 0.12758991125642224, "oldInstallCpi": 0.1488790019143178, "cpiDiff": 0.7843149000496372, "saving": 628.2362349397595, "newInstalls": 12846.0, "newActions": 801.0, "newSpend": 1639.02, "oldSpend": 33830.520000000004, "newSubCost": 2.0462172284644193, "oldSubCost": 2.8305321285140566, "newSubRate": 0.062354040168145726, "oldSubRate": 0.05259753119017757, "newRoi": 1.3374638503495992, "oldRoi": 0.6966999029278887, "newGross": 2192.13, "oldGross": 23569.72}, {"old": "老包池", "dayNo": 4, "date": "05-22", "fullDate": "2026-05-22", "newCpi": 2.4004573438874233, "oldCpi": 2.8982042431385753, "newInstallCpi": 0.1280529229614338, "oldInstallCpi": 0.15346732705047386, "cpiDiff": 0.497746899251152, "saving": 565.9382244485598, "newInstalls": 21314.0, "newActions": 1137.0, "newSpend": 2729.32, "oldSpend": 34424.869999999995, "newSubCost": 2.4004573438874233, "oldSubCost": 2.8982042431385753, "newSubRate": 0.05334521910481374, "oldSubRate": 0.05295255757554143, "newRoi": 0.9962078466431198, "oldRoi": 0.6576661001188967, "newGross": 2718.97, "oldGross": 22640.07}, {"old": "老包池", "dayNo": 5, "date": "05-23", "fullDate": "2026-05-23", "newCpi": 2.3440317919075144, "oldCpi": 2.957082947602296, "newInstallCpi": 0.14575163985982567, "oldInstallCpi": 0.15420016509855225, "cpiDiff": 0.6130511556947815, "saving": 848.4627994815776, "newInstalls": 22258.0, "newActions": 1384.0, "newSpend": 3244.14, "oldSpend": 31942.41, "newSubCost": 2.3440317919075144, "oldSubCost": 2.957082947602296, "newSubRate": 0.062179890376493845, "oldSubRate": 0.052146039807095375, "newRoi": 1.0436571787900646, "oldRoi": 0.6251582144240213, "newGross": 3385.77, "oldGross": 19969.06}, {"old": "老包池", "dayNo": 6, "date": "05-24", "fullDate": "2026-05-24", "newCpi": 2.608672622846203, "oldCpi": 3.1190781648258286, "newInstallCpi": 0.1900148747269093, "oldInstallCpi": 0.1774593591237136, "cpiDiff": 0.5104055419796256, "saving": 799.8054842820734, "newInstalls": 21513.0, "newActions": 1567.0, "newSpend": 4087.79, "oldSpend": 36711.55, "newSubCost": 2.608672622846203, "oldSubCost": 3.1190781648258286, "newSubRate": 0.07283967833403059, "oldSubRate": 0.05689480985918897, "newRoi": 0.8388738169035101, "oldRoi": 0.5420509349237501, "newGross": 3429.14, "oldGross": 19899.53}, {"old": "老包池", "dayNo": 7, "date": "05-25", "fullDate": "2026-05-25", "newCpi": 2.751774779449922, "oldCpi": 3.278470599502011, "newInstallCpi": 0.17404063279506368, "oldInstallCpi": 0.17331633944573263, "cpiDiff": 0.526695820052089, "saving": 1014.9428452403756, "newInstalls": 30468.0, "newActions": 1927.0, "newSpend": 5302.67, "oldSpend": 34233.79, "newSubCost": 2.751774779449922, "oldSubCost": 3.278470599502011, "newSubRate": 0.06324668504660627, "oldSubRate": 0.05286499731675459, "newRoi": 0.7445456722745334, "oldRoi": 0.4682949214796258, "newGross": 3948.08, "oldGross": 16031.51}, {"old": "老包池", "dayNo": 8, "date": "05-26", "fullDate": "2026-05-26", "newCpi": 2.672561166059344, "oldCpi": 3.0839823884436526, "newInstallCpi": 0.16658522340114865, "oldInstallCpi": 0.1675480957884269, "cpiDiff": 0.41142122238430856, "saving": 790.3401682002567, "newInstalls": 30819.0, "newActions": 1921.0, "newSpend": 5133.99, "oldSpend": 31169.809999999998, "newSubCost": 2.672561166059344, "oldSubCost": 3.0839823884436526, "newSubRate": 0.062331678510010056, "oldSubRate": 0.05432848657510683, "newRoi": 0.7955118728318521, "oldRoi": 0.5593146060242267, "newGross": 4084.15, "oldGross": 17433.73}, {"old": "老包池", "dayNo": 9, "date": "05-27", "fullDate": "2026-05-27", "newCpi": 2.8213204819277107, "oldCpi": 3.107194712961136, "newInstallCpi": 0.17696148963182395, "oldInstallCpi": 0.17369177326863697, "cpiDiff": 0.28587423103342546, "saving": 593.1890293943578, "newInstalls": 33082.0, "newActions": 2075.0, "newSpend": 5854.24, "oldSpend": 31500.739999999998, "newSubCost": 2.8213204819277107, "oldSubCost": 3.107194712961136, "newSubRate": 0.06272293089897829, "oldSubRate": 0.05589986766651963, "newRoi": 0.7021577523299353, "oldRoi": 0.5478531615447764, "newGross": 4110.6, "oldGross": 17257.78}, {"old": "老包池", "dayNo": 10, "date": "05-28", "fullDate": "2026-05-28", "newCpi": 2.7265402641670216, "oldCpi": 2.934477415719786, "newInstallCpi": 0.18704518882263532, "oldInstallCpi": 0.1691059088375516, "cpiDiff": 0.20793715155276438, "saving": 488.028494694338, "newInstalls": 34212.0, "newActions": 2347.0, "newSpend": 6399.19, "oldSpend": 31249.25, "newSubCost": 2.7265402641670216, "oldSubCost": 2.934477415719786, "newSubRate": 0.06860166023617444, "oldSubRate": 0.057627265397124317, "newRoi": 0.7604587455599849, "oldRoi": 0.6374847396337512, "newGross": 4866.32, "oldGross": 19920.92}, {"old": "老包池", "dayNo": 11, "date": "05-29", "fullDate": "2026-05-29", "newCpi": 2.8381473408892766, "oldCpi": 3.208305754042873, "newInstallCpi": 0.196040769624522, "oldInstallCpi": 0.2047641735874418, "cpiDiff": 0.37015841315359665, "saving": 849.1433997743508, "newInstalls": 33211.0, "newActions": 2294.0, "newSpend": 6510.71, "oldSpend": 17061.77, "newSubCost": 2.8381473408892766, "oldSubCost": 3.208305754042873, "newSubRate": 0.0690734997440607, "oldSubRate": 0.06382314819259757, "newRoi": 0.6922148275687291, "oldRoi": 0.49985962769396136, "newGross": 4506.81, "oldGross": 8528.49}, {"old": "老包池", "dayNo": 12, "date": "05-30", "fullDate": "2026-05-30", "newCpi": 3.0563703703703706, "oldCpi": 3.2718580127729098, "newInstallCpi": 0.21767871274070166, "oldInstallCpi": 0.20917647058823532, "cpiDiff": 0.21548764240253915, "saving": 465.45330758948455, "newInstalls": 30328.0, "newActions": 2160.0, "newSpend": 6601.76, "oldSpend": 22029.420000000002, "newSubCost": 3.0563703703703706, "oldSubCost": 3.2718580127729098, "newSubRate": 0.07122131363756265, "oldSubRate": 0.06393201348335945, "newRoi": 0.5731759409611982, "oldRoi": 0.4712116796538447, "newGross": 3783.97, "oldGross": 10380.52}, {"old": "老包池", "dayNo": 13, "date": "05-31", "fullDate": "2026-05-31", "newCpi": 3.1365769554247267, "oldCpi": 3.162197080291971, "newInstallCpi": 0.19670297212479232, "oldInstallCpi": 0.18330930888575458, "cpiDiff": 0.02562012486724452, "saving": 60.92465693430747, "newInstalls": 37919.0, "newActions": 2378.0, "newSpend": 7458.78, "oldSpend": 25993.260000000002, "newSubCost": 3.1365769554247267, "oldSubCost": 3.162197080291971, "newSubRate": 0.0627126242780664, "oldSubRate": 0.05796897038081805, "newRoi": 0.5335872622600479, "oldRoi": 0.5213643844596637, "newGross": 3979.91, "oldGross": 13551.96}, {"old": "老包池", "dayNo": 14, "date": "06-01", "fullDate": "2026-06-01", "newCpi": 2.98993947858473, "oldCpi": 3.1458638743455496, "newInstallCpi": 0.1905923375968187, "oldInstallCpi": 0.17995978093445147, "cpiDiff": 0.1559243957608194, "saving": 334.92560209424005, "newInstalls": 33697.0, "newActions": 2148.0, "newSpend": 6422.39, "oldSpend": 21030.1, "newSubCost": 2.98993947858473, "oldSubCost": 3.1458638743455496, "newSubRate": 0.06374454699231386, "oldSubRate": 0.05720520280677734, "newRoi": 0.6075744387992632, "oldRoi": 0.5291339556159981, "newGross": 3902.08, "oldGross": 11127.74}, {"old": "老包池", "dayNo": 15, "date": "06-02", "fullDate": "2026-06-02", "newCpi": 3.253644230769231, "oldCpi": 2.9655102040816326, "newInstallCpi": 0.1849368748975242, "oldInstallCpi": 0.16046769138934489, "cpiDiff": -0.28813402668759824, "saving": -299.65938775510216, "newInstalls": 18297.0, "newActions": 1040.0, "newSpend": 3383.79, "oldSpend": 10752.94, "newSubCost": 3.253644230769231, "oldSubCost": 2.9655102040816326, "newSubRate": 0.0568399191124228, "oldSubRate": 0.054111326667661545, "newRoi": 0.47930870414535187, "oldRoi": 0.6206098053183594, "newGross": 1621.88, "oldGross": 6673.38}]}, "coverage": [{"package": "CoupleLens", "first": "2026-02-18", "last": "2026-06-02", "days": 105, "spend": 496700.89, "installs": 3497669.0, "cpi": 0.1420091180726364, "subCost": 2.604032074571544}, {"package": "Minimix", "first": "2026-02-18", "last": "2026-04-17", "days": 59, "spend": 217924.43, "installs": 1579762.0, "cpi": 0.1379476338840914, "subCost": 2.3718116912092815}, {"package": "Vimi", "first": "2026-02-18", "last": "2026-04-17", "days": 59, "spend": 193290.0, "installs": 1394042.0, "cpi": 0.1386543590508751, "subCost": 2.301044035190057}, {"package": "Viyo", "first": "2026-02-18", "last": "2026-04-17", "days": 59, "spend": 144672.63, "installs": 1096437.0, "cpi": 0.13194796417851642, "subCost": 2.345611563280262}, {"package": "Veeo", "first": "2026-02-26", "last": "2026-04-17", "days": 51, "spend": 151725.66, "installs": 1010658.0, "cpi": 0.1501256211299965, "subCost": 2.352518179703853}, {"package": "Beyo", "first": "2026-03-07", "last": "2026-04-16", "days": 41, "spend": 199962.44999999998, "installs": 1490711.0, "cpi": 0.13413897797762275, "subCost": 2.3020440233471096}, {"package": "Heyo", "first": "2026-03-10", "last": "2026-04-17", "days": 39, "spend": 179169.38, "installs": 1220768.0, "cpi": 0.14676775603554484, "subCost": 2.5373426989364565}, {"package": "Beatmo", "first": "2026-03-24", "last": "2026-04-17", "days": 25, "spend": 19231.99, "installs": 93353.0, "cpi": 0.20601362570029888, "subCost": 3.080075272261371}, {"package": "Dradra", "first": "2026-04-03", "last": "2026-06-02", "days": 60, "spend": 290548.16, "installs": 1914156.0, "cpi": 0.15178917496797542, "subCost": 2.828407495741056}, {"package": "Usgen", "first": "2026-04-08", "last": "2026-06-02", "days": 55, "spend": 336356.13, "installs": 1956371.0, "cpi": 0.17192860147691824, "subCost": 2.861022668311147}, {"package": "Zikzik", "first": "2026-05-18", "last": "2026-06-02", "days": 16, "spend": 65662.19, "installs": 367920.0, "cpi": 0.17846866166557948, "subCost": 2.7848922724573755}, {"package": "Makmak", "first": "2026-06-02", "last": "2026-06-02", "days": 1, "spend": 884.58, "installs": 8457.0, "cpi": 0.10459737495565805, "subCost": 1.7209727626459144}]};
+    const fmtMoney = (v, d=0) => v == null || Number.isNaN(v) ? '-' : `${v < 0 ? '-' : ''}$${Math.abs(v).toLocaleString(undefined, {minimumFractionDigits:d, maximumFractionDigits:d})}`;
+    const fmtNum = (v, d=0) => v == null || Number.isNaN(v) ? '-' : v.toLocaleString(undefined, {minimumFractionDigits:d, maximumFractionDigits:d});
+    const fmtPct = (v, d=1) => v == null || Number.isNaN(v) ? '-' : `${(v*100).toFixed(d)}%`;
+    const fmtCpi = v => v == null || Number.isNaN(v) ? '-' : v.toFixed(4);
+    let active = 'Usgen';
+
+    function init() {
+      renderKpis();
+      renderMatrix();
+      renderTabs();
+      renderCoverage();
+      setActive(active);
+    }
+
+    function renderKpis() {
+      const rows = DATA.summary.filter(d => ['Usgen', 'Dradra', 'CoupleLens'].includes(d.old));
+      document.getElementById('kpis').innerHTML = rows.map(r => `
+        <div class="card kpi">
+          <div class="label">Zikzik vs ${r.old}</div>
+          <div class="value ${r.saving >= 0 ? 'positive' : 'negative'}">${fmtMoney(r.saving, 0)}</div>
+          <div class="hint">按 Zikzik 订阅次数估算；CPA 领先 ${r.advDays} / ${r.days} 天</div>
+          <div class="kpi-pair"><span>Zikzik CPA</span><strong>${fmtMoney(r.newCpi, 2)}</strong></div>
+          <div class="kpi-pair"><span>${r.old} CPA</span><strong>${fmtMoney(r.oldCpi, 2)}</strong></div>
+          <div class="kpi-pair"><span>订阅率</span><strong class="${r.newSubRate >= r.oldSubRate ? 'better' : 'worse'}">${fmtPct(r.newSubRate, 2)} vs ${fmtPct(r.oldSubRate, 2)}</strong></div>
+          <div class="kpi-pair"><span>安装 CPI</span><strong class="${r.newInstallCpi <= r.oldInstallCpi ? 'better' : 'worse'}">${fmtCpi(r.newInstallCpi)} vs ${fmtCpi(r.oldInstallCpi)}</strong></div>
+        </div>
+      `).join('');
+    }
+
+    function renderMatrix() {
+      const rows = DATA.summary;
+      const headers = ['对比对象','CPA领先','Zikzik CPA','对照包CPA','CPA节省金额','Zikzik订阅率','对照包订阅率','Zikzik安装CPI','对照包安装CPI','Zikzik ROI','对照包ROI'];
+      document.getElementById('matrix').innerHTML = `
+        <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+        <tbody>${rows.map(r => `
+          <tr>
+            <td><strong>Zikzik vs ${r.old}</strong></td>
+            <td>${r.advDays}/${r.days} 天</td>
+            <td>${fmtMoney(r.newCpi,2)}</td>
+            <td>${fmtMoney(r.oldCpi,2)}</td>
+            <td class="${r.saving >= 0 ? 'positive' : 'negative'}"><strong>${fmtMoney(r.saving,0)}</strong></td>
+            <td>${fmtPct(r.newSubRate,2)}</td>
+            <td>${fmtPct(r.oldSubRate,2)}</td>
+            <td>${fmtCpi(r.newInstallCpi)}</td>
+            <td>${fmtCpi(r.oldInstallCpi)}</td>
+            <td>${fmtPct(r.newRoi,1)}</td>
+            <td>${fmtPct(r.oldRoi,1)}</td>
+          </tr>`).join('')}</tbody>`;
+    }
+
+    function renderTabs() {
+      document.getElementById('tabs').innerHTML = DATA.summary.map(r => `<button class="tab" data-old="${r.old}">Zikzik vs ${r.old}</button>`).join('');
+      document.querySelectorAll('.tab').forEach(btn => btn.addEventListener('click', () => setActive(btn.dataset.old)));
+    }
+
+    function setActive(old) {
+      active = old;
+      document.querySelectorAll('.tab').forEach(btn => btn.classList.toggle('active', btn.dataset.old === old));
+      const summary = DATA.summary.find(d => d.old === old);
+      const rows = DATA.daily[old];
+      document.getElementById('pairTitle').textContent = `Zikzik vs ${old}`;
+      document.getElementById('pairNote').textContent = `${summary.start} 至 ${summary.end}，有效 ${summary.days} 天。`;
+      document.getElementById('sideMetrics').innerHTML = [
+        ['CPA领先天数', `${summary.advDays} / ${summary.days} 天`],
+        ['CPA估算节省', fmtMoney(summary.saving, 0)],
+        [`Zikzik/${old} CPA`, `${fmtMoney(summary.newCpi,2)} / ${fmtMoney(summary.oldCpi,2)}`],
+        [`Zikzik/${old} 安装CPI`, `${fmtCpi(summary.newInstallCpi)} / ${fmtCpi(summary.oldInstallCpi)}`],
+        [`Zikzik/${old} 订阅率`, `${fmtPct(summary.newSubRate,2)} / ${fmtPct(summary.oldSubRate,2)}`],
+        [`Zikzik/${old} ROI`, `${fmtPct(summary.newRoi,1)} / ${fmtPct(summary.oldRoi,1)}`],
+      ].map(([k,v]) => `<div class="metric-line"><span>${k}</span><strong>${v}</strong></div>`).join('');
+      drawLine('chartCpi', rows, 'newCpi', 'oldCpi', 'CPA', v => fmtMoney(v,2));
+      drawBars('chartSaving', rows, 'saving', fmtMoney);
+      drawLine('chartSubCost', rows, 'newInstallCpi', 'oldInstallCpi', '安装CPI', fmtCpi);
+      drawLine('chartSubRate', rows, 'newSubRate', 'oldSubRate', '订阅率', v => fmtPct(v,1));
+      drawLine('chartRoi', rows, 'newRoi', 'oldRoi', 'ROI', v => fmtPct(v,1));
+      drawBars('chartDiff', rows, 'cpiDiff', v => fmtMoney(v,2));
+      renderDaily(rows);
+    }
+
+    function scale(values, minPix, maxPix, pad=0.12) {
+      const filtered = values.filter(v => v != null && !Number.isNaN(v));
+      let min = Math.min(...filtered), max = Math.max(...filtered);
+      if (min === max) { min -= 1; max += 1; }
+      const span = max - min;
+      min -= span * pad; max += span * pad;
+      return v => maxPix - ((v - min) / (max - min)) * (maxPix - minPix);
+    }
+
+    function xScale(rows, left, right) {
+      return i => rows.length === 1 ? (left + right)/2 : left + (i/(rows.length-1))*(right-left);
+    }
+
+    function drawLine(target, rows, keyA, keyB, label, formatter) {
+      const W = 760, H = 280, L = 54, R = 20, T = 22, B = 44;
+      const x = xScale(rows, L, W-R);
+      const y = scale(rows.flatMap(r => [r[keyA], r[keyB]]), T, H-B);
+      const mkPath = key => rows.map((r,i) => `${i?'L':'M'}${x(i).toFixed(1)} ${y(r[key]).toFixed(1)}`).join(' ');
+      const grid = [0,1,2,3].map(i => `<line class="gridline" x1="${L}" x2="${W-R}" y1="${T+i*(H-B-T)/3}" y2="${T+i*(H-B-T)/3}"/>`).join('');
+      const labels = rows.map((r,i) => i % 2 === 0 ? `<text x="${x(i)}" y="${H-17}" text-anchor="middle" font-size="10" fill="#64748b">${r.date}</text>` : '').join('');
+      const labelBg = (text, tx, ty, color) => `
+        <text x="${tx}" y="${ty}" text-anchor="middle" font-size="9.5" stroke="#fff" stroke-width="4" paint-order="stroke" fill="${color}">${text}</text>
+        <text x="${tx}" y="${ty}" text-anchor="middle" font-size="9.5" fill="${color}">${text}</text>`;
+      const dots = rows.map((r,i) => {
+        const aHigher = r[keyA] >= r[keyB];
+        const aY = y(r[keyA]);
+        const bY = y(r[keyB]);
+        const aLabelY = aHigher ? aY - 10 : aY + 18;
+        const bLabelY = aHigher ? bY + 18 : bY - 10;
+        return `
+        <circle class="dot-new" cx="${x(i)}" cy="${y(r[keyA])}" r="4"><title>${r.fullDate} Zikzik：${formatter(r[keyA])}</title></circle>
+        <circle class="dot-old" cx="${x(i)}" cy="${y(r[keyB])}" r="4"><title>${r.fullDate} ${active}：${formatter(r[keyB])}</title></circle>
+        ${labelBg(formatter(r[keyA]), x(i), aLabelY, '#2563eb')}
+        ${labelBg(formatter(r[keyB]), x(i), bLabelY, '#b45309')}
+      `;
+      }).join('');
+      document.getElementById(target).innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${label} line chart">
+        ${grid}<line class="axis" x1="${L}" x2="${W-R}" y1="${H-B}" y2="${H-B}"/><line class="axis" x1="${L}" x2="${L}" y1="${T}" y2="${H-B}"/>
+        <path class="line-new" d="${mkPath(keyA)}"/><path class="line-old" d="${mkPath(keyB)}"/>
+        ${dots}${labels}
+      </svg><div class="legend"><span><i style="background:var(--blue)"></i>Zikzik</span><span><i style="background:var(--amber)"></i>${active}</span></div>`;
+    }
+
+    function drawBars(target, rows, key, formatter) {
+      const W = 760, H = 280, L = 54, R = 20, T = 20, B = 44;
+      const vals = rows.map(r => r[key]);
+      const maxAbs = Math.max(...vals.map(v => Math.abs(v || 0))) || 1;
+      const zero = T + (H-B-T)/2;
+      const x = xScale(rows, L+12, W-R-12);
+      const bw = Math.max(10, (W-L-R)/rows.length * 0.58);
+      const bars = rows.map((r,i) => {
+        const h = Math.abs(r[key]) / maxAbs * ((H-B-T)/2 - 12);
+        const y = r[key] >= 0 ? zero - h : zero;
+        const label = formatter(r[key], key==='saving'?0:4);
+        const labelY = r[key] >= 0 ? y-5 : y+h+13;
+        return `<rect class="${r[key] >= 0 ? 'bar-pos' : 'bar-neg'}" x="${x(i)-bw/2}" y="${y}" width="${bw}" height="${h}" rx="3"><title>${r.fullDate}：${label}</title></rect>
+          <text x="${x(i)}" y="${labelY}" text-anchor="middle" font-size="9.5" stroke="#fff" stroke-width="4" paint-order="stroke" fill="#334155">${label}</text>
+          <text x="${x(i)}" y="${labelY}" text-anchor="middle" font-size="9.5" fill="#334155">${label}</text>
+          ${i % 2 === 0 ? `<text x="${x(i)}" y="${H-17}" text-anchor="middle" font-size="10" fill="#64748b">${r.date}</text>` : ''}`;
+      }).join('');
+      document.getElementById(target).innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="bar chart">
+        <line class="axis" x1="${L}" x2="${W-R}" y1="${zero}" y2="${zero}"/>
+        <line class="axis" x1="${L}" x2="${L}" y1="${T}" y2="${H-B}"/>
+        ${bars}
+      </svg><div class="legend"><span><i style="background:#22c55e"></i>Zikzik 更优</span><span><i style="background:#ef4444"></i>Zikzik 更差</span></div>`;
+    }
+
+    function renderDaily(rows) {
+      const headers = ['天数','日期','Zikzik CPA',`${active} CPA`,'CPA差值','CPA节省金额','Zikzik订阅数','Zikzik安装CPI',`${active}安装CPI`,'Zikzik订阅率',`${active}订阅率`,'Zikzik ROI',`${active} ROI`];
+      document.getElementById('dailyTable').innerHTML = `<thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `
+        <tr>
+          <td>${r.dayNo}</td><td>${r.fullDate}</td><td>${fmtMoney(r.newCpi,2)}</td><td>${fmtMoney(r.oldCpi,2)}</td>
+          <td class="${r.cpiDiff >= 0 ? 'positive' : 'negative'}">${fmtMoney(r.cpiDiff,2)}</td>
+          <td class="${r.saving >= 0 ? 'positive' : 'negative'}"><strong>${fmtMoney(r.saving,0)}</strong></td>
+          <td>${fmtNum(r.newActions,0)}</td><td>${fmtCpi(r.newInstallCpi)}</td><td>${fmtCpi(r.oldInstallCpi)}</td>
+          <td>${fmtPct(r.newSubRate,2)}</td><td>${fmtPct(r.oldSubRate,2)}</td><td>${fmtPct(r.newRoi,1)}</td><td>${fmtPct(r.oldRoi,1)}</td>
+        </tr>`).join('')}</tbody>`;
+    }
+
+    function renderCoverage() {
+      const rows = DATA.coverage;
+      const headers = ['包体','起始','结束','天数','累计消耗','累计安装','加权CPI','订阅成本'];
+      document.getElementById('coverageTable').innerHTML = `<thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `
+        <tr><td><strong>${r.package}</strong></td><td>${r.first}</td><td>${r.last}</td><td>${r.days}</td><td>${fmtMoney(r.spend,0)}</td><td>${fmtNum(r.installs,0)}</td><td>${fmtCpi(r.cpi)}</td><td>${fmtMoney(r.subCost,2)}</td></tr>
+      `).join('')}</tbody>`;
+    }
+    init();
+  </script>
+</body>
+</html>
