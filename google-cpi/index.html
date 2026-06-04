@@ -87,8 +87,8 @@
       <div class="badge-row">
         <span class="badge">渠道：google</span>
         <span class="badge">老包基准：Facefame</span>
-        <span class="badge">新包候选：Heyo / Beyo / Veeo</span>
-        <span class="badge">补充：Funpack / Viyo / Vimi</span>
+        <span class="badge">新包候选：Heyo / Funpack / Beyo / Veeo / Viyo / Vimi</span>
+        <span class="badge">顶部展示：6 个对比结论</span>
       </div>
     </header>
 
@@ -98,8 +98,8 @@
       <div class="card panel-pad">
         <div class="section-head"><h2>结论摘要</h2></div>
         <div class="callouts">
-          <div class="callout good"><strong>可做补充样本：</strong>Heyo、Beyo、Veeo 均可与 Facefame 做 21 天以上同期对比，可用于验证 google 渠道下新包策略是否复现。</div>
-          <div class="callout"><strong>结论偏谨慎：</strong>google 新包的 CPI 优势弱于 meta 中 Zikzik vs Usgen；Heyo、Beyo、Veeo 只有小幅节省或接近持平。</div>
+          <div class="callout good"><strong>完整展示：</strong>顶部 6 张卡片覆盖 Heyo、Funpack、Beyo、Veeo、Viyo、Vimi 与 Facefame 的所有同期对比。</div>
+          <div class="callout"><strong>结论偏谨慎：</strong>google 新包的 CPI 优势弱于 meta 中 Zikzik vs Usgen；只有部分包有小幅节省或接近持平。</div>
           <div class="callout warn"><strong>负向样本也重要：</strong>Funpack、Viyo、Vimi 的安装成本相对 Facefame 明显偏高，说明 google 渠道不能直接推出“新包一定更便宜”。</div>
           <div class="callout warn"><strong>口径限制：</strong>素材相似性无法从当前表字段验证；Vimi 只有 6 天数据，周期偏短，更适合作为早期观察而非稳定结论。</div>
         </div>
@@ -178,7 +178,7 @@
     }
 
     function renderKpis() {
-      const rows = DATA.summary.filter(d => ['Heyo', 'Beyo', 'Veeo'].includes(d.old));
+      const rows = DATA.summary;
       document.getElementById('kpis').innerHTML = rows.map(r => `
         <div class="card kpi">
           <div class="label">${r.old} vs ${BASELINE}</div>

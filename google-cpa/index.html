@@ -87,8 +87,8 @@
       <div class="badge-row">
         <span class="badge">渠道：google</span>
         <span class="badge">老包基准：Facefame</span>
-        <span class="badge">新包候选：Heyo / Beyo / Veeo</span>
-        <span class="badge">补充：Funpack / Viyo / Vimi</span>
+        <span class="badge">新包候选：Heyo / Funpack / Beyo / Veeo / Viyo / Vimi</span>
+        <span class="badge">顶部展示：6 个对比结论</span>
       </div>
     </header>
 
@@ -179,7 +179,7 @@
     }
 
     function renderKpis() {
-      const rows = DATA.summary.filter(d => ['Heyo', 'Beyo', 'Veeo'].includes(d.old));
+      const rows = DATA.summary;
       document.getElementById('kpis').innerHTML = rows.map(r => `
         <div class="card kpi">
           <div class="label">${r.old} vs ${BASELINE}</div>
