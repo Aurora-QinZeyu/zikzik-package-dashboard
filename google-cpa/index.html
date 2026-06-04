@@ -14,7 +14,8 @@
     body { margin:0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); }
     .shell { max-width:1440px; margin:0 auto; padding:28px 28px 56px; }
     header { display:grid; grid-template-columns:1fr auto; gap:22px; align-items:end; padding:24px 0 18px; border-bottom:1px solid var(--line); }
-    h1 { margin:0; font-size:30px; letter-spacing:0; line-height:1.15; }
+    header > div:first-child { min-width:0; }
+    h1 { margin:0; font-size:28px; letter-spacing:0; line-height:1.15; white-space:nowrap; }
     .subtitle { margin-top:10px; color:var(--muted); font-size:14px; line-height:1.7; max-width:980px; }
     .badge-row { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
     .badge { padding:7px 10px; border:1px solid var(--line); background:#fff; border-radius:6px; font-size:12px; color:var(--slate); }
@@ -81,7 +82,7 @@
   <div class="shell">
     <header>
       <div>
-        <h1>Google 渠道新老包 CPA 同期对比分析 Dashboard</h1>
+        <h1>Google CPA 新老包同期对比看板</h1>
         <div class="subtitle">目标：在 google 渠道内，判断多个新包候选相对老包基准 Facefame 的同期 CPA、CPA 节省金额、订阅效率和含后续毛利表现。CPA 使用 <strong>消耗 / 订阅次数</strong> 计算；每个新包均从自身可观察上线窗口开始，与 Facefame 同日期直接对比，并仅保留双方 CPA 可计算的日期。</div>
       </div>
       <div class="badge-row">
@@ -108,9 +109,9 @@
             <tr><th>新包候选</th><td class="wrap">Heyo、Funpack、Beyo、Veeo、Viyo、Vimi；均为 google 渠道中晚于 Facefame 出现且仍可观察到 2026-06-02 的包体。</td></tr>
             <tr><th>老包基准</th><td class="wrap">Facefame：google 渠道最早出现、覆盖天数最长、累计安装规模最大的包体。</td></tr>
             <tr><th>同期定义</th><td class="wrap">每个新包取自身可观察窗口，并与 Facefame 在完全相同自然日期上比较；若某日订阅次数为 0 导致 CPA 无法计算，则该日不参与 CPA 对比。</td></tr>
-            <tr><th>评估口径</th><td class="wrap">本看板评估 CPA（消耗 / 订阅次数，对应订阅成本）。绿色/正数表示新包候选按订阅次数估算更省钱；红色/负数表示新包候选订阅获取成本更高。</td></tr>
+            <tr><th>评估口径</th><td class="wrap">CPA = 消耗 / 订阅次数；绿色/正数=新包更省，红色/负数=新包更贵。</td></tr>
             <tr><th>收益口径</th><td class="wrap">每日 CPA 节省 = 新包订阅次数 × (Facefame 当日 CPA - 新包当日 CPA)，按日求和。</td></tr>
-            <tr><th>口径现状</th><td class="wrap">当前只做同渠道、同期自然日期对比，没有考虑素材因素；素材相似性无法从当前表字段验证，订阅次数较少的日期 CPA 波动会更大。</td></tr>
+            <tr><th>口径现状</th><td class="wrap">未纳入素材因素；素材相似性需投放侧确认，低订阅日 CPA 波动较大。</td></tr>
           </tbody>
         </table>
       </div>
