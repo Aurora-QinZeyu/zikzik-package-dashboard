@@ -1,14 +1,20 @@
-# Zikzik New vs Old Package Dashboard
+# New vs Old Package Dashboards
 
-This directory is the static GitHub Pages site for the Zikzik new/old package comparison dashboard.
+这个仓库用于托管新老包体对比分析看板。
 
-- Entry page: `index.html`
-- Source dashboard: `outputs/new_old_package_analysis/dashboard/index.html`
+## 看板入口
 
-To preview locally:
+| 看板 | 口径 | 线上链接 | 仓库文件 |
+|---|---|---|---|
+| Meta CPI 看板 | 消耗 / 安装次数 | [打开看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/) | `index.html` |
+| Meta CPA 看板 | 消耗 / 订阅次数 | [打开看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/meta-cpa/) | `meta-cpa/index.html` |
+| Google CPI 看板 | 消耗 / 安装次数 | [打开看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/google-cpi/) | `google-cpi/index.html` |
+| Google CPA 看板 | 消耗 / 订阅次数 | [打开看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/google-cpa/) | `google-cpa/index.html` |
 
-```bash
-python3 -m http.server 8000
-```
+## 口径说明
 
-Then open `http://127.0.0.1:8000/`.
+- CPI = 消耗 / 安装次数
+- CPA = 消耗 / 订阅次数
+- 节省金额按日计算后求和：
+  - CPI 节省 = 新包当日安装次数 × (老包当日 CPI - 新包当日 CPI)
+  - CPA 节省 = 新包当日订阅次数 × (老包当日 CPA - 新包当日 CPA)
