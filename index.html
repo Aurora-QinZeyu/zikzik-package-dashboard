@@ -35,7 +35,7 @@
     .section-head { display:flex; justify-content:space-between; align-items:center; gap:16px; margin:8px 0 12px; }
     h2 { margin:0; font-size:20px; letter-spacing:0; }
     .note { color:var(--muted); font-size:13px; line-height:1.6; }
-    .summary-grid { grid-template-columns:1.05fr .95fr; }
+    .summary-grid { grid-template-columns:1fr; }
     .panel-pad { padding:18px; }
     .callouts { display:grid; gap:10px; }
     .callout { border-left:4px solid var(--blue); background:#f8fbff; padding:12px 14px; border-radius:6px; line-height:1.6; font-size:14px; }
@@ -93,8 +93,6 @@
       </div>
     </header>
 
-    <div class="grid kpis" id="kpis"></div>
-
     <section class="grid summary-grid">
       <div class="card panel-pad">
         <div class="section-head"><h2>结论摘要</h2></div>
@@ -102,6 +100,11 @@
           <div class="callout good"><strong>结论：</strong>Zikzik 相比 Usgen 在 15 天内 CPI 领先 14 天，按新包安装量估算节省约 $8,239；但对 Dradra、CoupleLens 和老包池，CPI 优势不稳定，不能直接推出“新包一定优于所有老包”。</div>
         </div>
       </div>
+    </section>
+
+    <div class="grid kpis" id="kpis"></div>
+
+    <section class="grid summary-grid">
       <div class="card panel-pad">
         <div class="section-head"><h2>样本口径</h2></div>
         <table>

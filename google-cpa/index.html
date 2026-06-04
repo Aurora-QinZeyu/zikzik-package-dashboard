@@ -35,7 +35,7 @@
     .section-head { display:flex; justify-content:space-between; align-items:center; gap:16px; margin:8px 0 12px; }
     h2 { margin:0; font-size:20px; letter-spacing:0; }
     .note { color:var(--muted); font-size:13px; line-height:1.6; }
-    .summary-grid { grid-template-columns:1.05fr .95fr; }
+    .summary-grid { grid-template-columns:1fr; }
     .panel-pad { padding:18px; }
     .callouts { display:grid; gap:10px; }
     .callout { border-left:4px solid var(--blue); background:#f8fbff; padding:12px 14px; border-radius:6px; line-height:1.6; font-size:14px; }
@@ -93,8 +93,6 @@
       </div>
     </header>
 
-    <div class="grid kpis" id="kpis"></div>
-
     <section class="grid summary-grid">
       <div class="card panel-pad">
         <div class="section-head"><h2>结论摘要</h2></div>
@@ -102,6 +100,11 @@
           <div class="callout good"><strong>结论：</strong>Google 渠道 CPA 结论与 CPI 不完全一致；部分安装成本偏高的新包，因为订阅率表现不同，在订阅获取成本口径下仍需要单独判断。</div>
         </div>
       </div>
+    </section>
+
+    <div class="grid kpis" id="kpis"></div>
+
+    <section class="grid summary-grid">
       <div class="card panel-pad">
         <div class="section-head"><h2>样本口径</h2></div>
         <table>
