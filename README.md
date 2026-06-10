@@ -1,17 +1,17 @@
 # New vs Old Package Dashboards
 
-这个仓库用于托管新老包体对比分析看板。看板是纯静态 HTML，可以部署为受控 HTTPS 网页，再把链接放进飞书文档或知识库。
+这个仓库用于通过 GitHub Pages 托管新老包体对比分析看板。
 
-> 注意：不要把包含业务数据的看板继续用公开 GitHub Pages 裸链分享。私密查看请使用 [受控 HTTPS 发布方案](DEPLOY_PRIVATE.md)。
+> 注意：当前仓库和 GitHub Pages 均为公开访问，请不要上传不适合公开传播的数据。
 
 ## 看板入口
 
-| 看板 | 口径 | 受控 HTTPS 路径 | 仓库文件 |
+| 看板 | 口径 | 线上链接 | 仓库文件 |
 |---|---|---|---|
-| Meta CPI 看板 | 消耗 / 安装次数 | `/` | `index.html` |
-| Meta CPA 看板 | 消耗 / 订阅次数 | `/meta-cpa/` | `meta-cpa/index.html` |
-| Google CPI 看板 | 消耗 / 安装次数 | `/google-cpi/` | `google-cpi/index.html` |
-| Google CPA 看板 | 消耗 / 订阅次数 | `/google-cpa/` | `google-cpa/index.html` |
+| Meta CPI 看板 | 消耗 / 安装次数 | [打开看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/) | `index.html` |
+| Meta CPA 看板 | 消耗 / 订阅次数 | [打开看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/meta-cpa/) | `meta-cpa/index.html` |
+| Google CPI 看板 | 消耗 / 安装次数 | [打开看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/google-cpi/) | `google-cpi/index.html` |
+| Google CPA 看板 | 消耗 / 订阅次数 | [打开看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/google-cpa/) | `google-cpa/index.html` |
 
 ## 口径说明
 
