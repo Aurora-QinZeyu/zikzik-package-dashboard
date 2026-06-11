@@ -22,6 +22,7 @@ github-pages-site/
 | Google CPA | `/google-cpa/` |
 | 四组分日趋势 | `/final-group-daily-trends/` |
 | 四组素材归因总览 | `/final-group-daily-trends/material-attribution.html` |
+| 老包池对比 | `/final-group-daily-trends/old-pool-comparison.html` |
 | Zikzik 素材归因 | `/final-group-daily-trends/zikzik-material-attribution.html` |
 | Beyo 素材归因 | `/final-group-daily-trends/beyo-material-attribution.html` |
 | Heyo 素材归因 | `/final-group-daily-trends/heyo-material-attribution.html` |
@@ -77,6 +78,7 @@ Emails ending in: 你的公司邮箱域名
 ```text
 https://你的域名/google-cpa/
 https://你的域名/final-group-daily-trends/material-attribution.html
+https://你的域名/final-group-daily-trends/old-pool-comparison.html
 ```
 
 如果飞书当前版本支持嵌入网页，可以选择嵌入；如果嵌入时遇到登录页或跨域限制，就改成按钮/链接跳转。跳转方式最稳定。

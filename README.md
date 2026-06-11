@@ -14,6 +14,7 @@
 | Google CPA 看板 | 消耗 / 订阅次数 | [打开看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/google-cpa/) | `google-cpa/index.html` |
 | 四组新老包体分日趋势看板 | 同期老包池对比，初期连续成本优势 | [打开看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/final-group-daily-trends/) | `final-group-daily-trends/index.html` |
 | 四组素材归因看板 | 逐日对齐老包池 CPA，拆解素材解释金额 | [打开看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/final-group-daily-trends/material-attribution.html) | `final-group-daily-trends/material-attribution.html` |
+| 老包池对比看板 | 只看老包池内部，拆解老包包体与素材表现 | [打开看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/final-group-daily-trends/old-pool-comparison.html) | `final-group-daily-trends/old-pool-comparison.html` |
 
 ## 素材归因看板
 
@@ -35,6 +36,34 @@
 | Heyo | $3,258 | $3,357 | 基本由少数素材拉动 |
 | Beatmo | -$585 | $316 | 反例；正贡献不足以抵消负贡献 |
 
+## 老包池对比看板
+
+老包池对比看板用于补充素材归因页，回答：老包池内部到底是什么情况，哪些老包包体和素材在拉低或拖高老包池 CPA。
+
+入口：[打开老包池对比看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/final-group-daily-trends/old-pool-comparison.html)
+
+看板内容包括：
+
+- 每组老包池的包体级 CPA、CPI、订阅率、消耗占比、订阅占比
+- 每个老包对老包池 CPA 的拉动方向：
+  - 正值 = 该老包低于老包池均值，拉低老包池 CPA
+  - 负值 = 该老包高于老包池均值，拖高老包池 CPA
+- 老包池素材气泡图：
+  - 横轴 = 素材消耗规模
+  - 纵轴 = CPA，越低越好
+  - 圆圈大小 = 订阅数
+  - 颜色 = 不同老包包体
+- 老包池正贡献素材 Top 10 和负贡献素材 Top 10
+
+老包池对比结果摘要：
+
+| 组 | 老包池内主要拉低 CPA 的老包 | 老包池内主要拖高 CPA 的老包 |
+|---|---|---|
+| Zikzik 对照老包池 | CoupleLens | Dradra、Usgen |
+| Beyo 对照老包池 | Vimi、CoupleLens、Minimix | Viyo |
+| Heyo 对照老包池 | Minimix、CoupleLens、Vimi | Viyo |
+| Beatmo 对照老包池 | Vimi、Viyo、CoupleLens | Minimix |
+
 ## 口径说明
 
 - CPI = 消耗 / 安装次数
@@ -53,6 +82,10 @@
   - 圆圈大小 = 订阅数
   - 红色虚线 = 同窗口老包池平均 CPA
   - 上半块展示新包素材，下半块展示老包池素材，避免新老素材重叠造成误读
+- 老包池 CPA 拉动金额：
+  - 老包包体或老包素材 CPA 拉动 = 老包包体或素材订阅数 × 当日老包池 CPA - 老包包体或素材消耗
+  - 正值说明该包体或素材低于当日老包池 CPA，拉低池子整体 CPA
+  - 负值说明该包体或素材高于当日老包池 CPA，拖高池子整体 CPA
 
 ## 文件结构
 
@@ -61,11 +94,14 @@ final-group-daily-trends/
   index.html                                  # 四组分日趋势主看板
   final_group_daily_trends.csv                # 分日趋势数据
   material-attribution.html                   # 四组素材归因总览
+  old-pool-comparison.html                    # 老包池对比看板
   zikzik-material-attribution.html            # Zikzik 素材归因页
   beyo-material-attribution.html              # Beyo 素材归因页
   heyo-material-attribution.html              # Heyo 素材归因页
   beatmo-material-attribution.html            # Beatmo 素材归因页
   *_daily_aligned_material_attribution.csv    # 各组素材逐日对齐归因数据
+  old_pool_package_summary.csv                # 老包池包体级汇总
+  old_pool_material_contribution.csv          # 老包池素材级正负贡献
 ```
 
 ## 更新流程
@@ -75,6 +111,7 @@ final-group-daily-trends/
 ```text
 scripts/build_final_group_daily_trends.py
 scripts/build_group_material_attribution_dashboards.py
+scripts/build_old_pool_comparison_dashboard.py
 ```
 
 更新数据后，先在上层分析项目重新生成静态文件，再进入本仓库提交并推送：
@@ -82,6 +119,7 @@ scripts/build_group_material_attribution_dashboards.py
 ```bash
 python3 scripts/build_final_group_daily_trends.py
 python3 scripts/build_group_material_attribution_dashboards.py
+python3 scripts/build_old_pool_comparison_dashboard.py
 git -C github-pages-site status --short
 git -C github-pages-site add README.md final-group-daily-trends/
 git -C github-pages-site commit -m "Update package dashboards"
