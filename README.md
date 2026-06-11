@@ -13,6 +13,7 @@
 | Google CPI 看板 | 消耗 / 安装次数 | [打开看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/google-cpi/) | `google-cpi/index.html` |
 | Google CPA 看板 | 消耗 / 订阅次数 | [打开看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/google-cpa/) | `google-cpa/index.html` |
 | 四组新老包体分日趋势看板 | 同期老包池对比，初期连续成本优势 | [打开看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/final-group-daily-trends/) | `final-group-daily-trends/index.html` |
+| 四组素材归因看板 | 逐日对齐老包池 CPA，拆解素材解释金额 | [打开看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/final-group-daily-trends/material-attribution.html) | `final-group-daily-trends/material-attribution.html` |
 
 ## 口径说明
 
