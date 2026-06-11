@@ -20,6 +20,12 @@ github-pages-site/
 | Meta CPA | `/meta-cpa/` |
 | Google CPI | `/google-cpi/` |
 | Google CPA | `/google-cpa/` |
+| 四组分日趋势 | `/final-group-daily-trends/` |
+| 四组素材归因总览 | `/final-group-daily-trends/material-attribution.html` |
+| Zikzik 素材归因 | `/final-group-daily-trends/zikzik-material-attribution.html` |
+| Beyo 素材归因 | `/final-group-daily-trends/beyo-material-attribution.html` |
+| Heyo 素材归因 | `/final-group-daily-trends/heyo-material-attribution.html` |
+| Beatmo 素材归因 | `/final-group-daily-trends/beatmo-material-attribution.html` |
 
 ### 2. 在 Cloudflare Pages 创建项目
 
@@ -70,6 +76,7 @@ Emails ending in: 你的公司邮箱域名
 
 ```text
 https://你的域名/google-cpa/
+https://你的域名/final-group-daily-trends/material-attribution.html
 ```
 
 如果飞书当前版本支持嵌入网页，可以选择嵌入；如果嵌入时遇到登录页或跨域限制，就改成按钮/链接跳转。跳转方式最稳定。
@@ -90,4 +97,3 @@ https://你的域名/google-cpa/
 | `robots.txt` | 阻止搜索引擎抓取 |
 
 这些只能降低被发现和收录的风险，不能替代登录鉴权。
-
