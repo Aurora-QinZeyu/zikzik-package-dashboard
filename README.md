@@ -15,6 +15,7 @@
 | 四组新老包体分日趋势看板 | 同期老包池对比，初期连续成本优势 | [打开看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/final-group-daily-trends/) | `final-group-daily-trends/index.html` |
 | 四组素材归因看板 | 逐日对齐老包池 CPA，拆解素材解释金额 | [打开看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/final-group-daily-trends/material-attribution.html) | `final-group-daily-trends/material-attribution.html` |
 | 老包池对比看板 | 只看老包池内部，拆解老包包体与素材表现 | [打开看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/final-group-daily-trends/old-pool-comparison.html) | `final-group-daily-trends/old-pool-comparison.html` |
+| 头部素材跨包复用与生命周期看板 | 头部素材跨包表现、好坏判断、复用时间与生命周期稳定性 | [打开看板](https://aurora-qinzeyu.github.io/zikzik-package-dashboard/material-lifecycle/) | `material-lifecycle/index.html` |
 
 ## 素材归因看板
 
@@ -102,6 +103,8 @@ final-group-daily-trends/
   *_daily_aligned_material_attribution.csv    # 各组素材逐日对齐归因数据
   old_pool_package_summary.csv                # 老包池包体级汇总
   old_pool_material_contribution.csv          # 老包池素材级正负贡献
+material-lifecycle/
+  index.html                                  # 头部素材跨包复用与生命周期看板
 ```
 
 ## 更新流程
